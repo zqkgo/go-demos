@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <link rel="stylesheet" href="public/components/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="public/components/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="public/components/Ionicons/css/ionicons.min.css">
+    <link rel="stylesheet" href="public/dist/css/AdminLTE.min.css">
+    <link rel="stylesheet" href="public/dist/css/skins/_all-skins.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
+</head>
+<body class="hold-transition skin-blue sidebar-mini">
+<div class="container" style="background-color: #ecf0f5">
+    <div class="row">
+        <div class="col-sm-12 col-md-6 col-lg-offset-3">
+            <div class="box box-primary direct-chat direct-chat-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">群聊</h3>
+                </div>
+                <div class="box-body">
+                    <div class="direct-chat-messages" style="min-height: 600px">
+
+                    </div>
+                </div>
+                <div class="box-footer">
+                    <div>
+                        <div class="input-group">
+                            <input id="txt" type="text" name="message" placeholder="请输入..." class="form-control">
+                            <span class="input-group-btn">
+                        <button id="send" class="btn btn-primary btn-flat">发送</button>
+                      </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="public/components/jquery/dist/jquery.min.js"></script>
+<script src="public/components/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="public/components/jquery-slimscroll/jquery.slimscroll.min.js"></script>
+<script src="public/components/fastclick/lib/fastclick.js"></script>
+<script src="dist/js/adminlte.min.js"></script>
+<script src="dist/js/demo.js"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        let ws = new WebSocket("ws://127.0.0.1:8000/ws");
+        let username = "";
+        // 发送
+        $('#send').click(function () {
+            if (username === "") {
+                setTimeout(null, 2000);
+            }
+            let txt = $('#txt').val();
+            if (txt === "") {
+                return;
+            }
+            let msg = {
+                message: txt,
+                username: username
+            };
+            $('#txt').val('');
+            ws.send(JSON.stringify(msg));
+        });
+
+        // 收到
+        ws.onmessage = function (event) {
+            let msg = JSON.parse(event.data);
+            if (msg.message === "") {
+                username = msg.username;
+                return;
+            }
+            let isCur = 'left';
+            if (username === msg.username) {
+                isCur = 'right';
+            }
+            let time = new Date();
+            let timeStr = time.toLocaleTimeString();
+            let html = '<div class="direct-chat-msg ' + isCur + '">';
+            html += '<div class="direct-chat-info clearfix">'+
+                        '<span class="direct-chat-name '+ (isCur === 'right' ? 'pull-right' : 'pull-left') +'">' + msg.username + '</span>' +
+                        '<span class="direct-chat-timestamp '+(isCur === 'right' ? 'pull-left' : 'pull-right')+'">' + timeStr + '</span></div>';
+            html += '<div class="direct-chat-text">' + msg.message + '</div></div>';
+            $('.direct-chat-messages').append(html);
+        }
+    });
+</script>
+</body>
+</html>
