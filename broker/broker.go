@@ -19,8 +19,8 @@ type Subscriber struct {
 }
 
 func (s *Subscriber) Unsubscribe() {
-	//s.Broker.Lock()
-	//defer s.Broker.Unlock()
+	s.Broker.Lock()
+	defer s.Broker.Unlock()
 	var newSubscribers []*Subscriber
 	// 移除订阅者
 	for _, subscriber := range s.Broker.Subs[s.T] {
@@ -46,6 +46,7 @@ func (b *Broker) Subscribe(topic Topic, handler Handler) (ISubscriber, error) {
 	// 支持并发写map
 	b.Lock()
 	defer b.Unlock()
+
 	if len(topic) == 0 {
 		return nil, InvalidTopicError
 	}
