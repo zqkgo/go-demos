@@ -28,9 +28,10 @@ var (
 func main() {
 	http.HandleFunc("/", inRoom)
 	http.HandleFunc("/ws", iniWsConn)
-	// serve static files, css, js, img, etc.
+	// 静态文件服务，例如js css image
 	fs := http.FileServer(http.Dir("public"))
 	http.Handle("/public/", http.StripPrefix("/public", fs))
+	// 独立goroutine分发消息
 	go handleMsgs()
 	err := http.ListenAndServe(":8000", nil)
 	if err != nil {
@@ -38,11 +39,13 @@ func main() {
 	}
 }
 
+// 进入聊天室网页
 func inRoom(w http.ResponseWriter, r *http.Request) {
 	tmpl, _ := template.ParseFiles("index.html")
 	tmpl.Execute(w, nil)
 }
 
+// 初始化连接，从HTTP Upgrade到Websocket
 func iniWsConn(w http.ResponseWriter, r *http.Request) {
 	upgrader.CheckOrigin = func(r *http.Request) bool {
 		return true
@@ -55,13 +58,14 @@ func iniWsConn(w http.ResponseWriter, r *http.Request) {
 
 	clients.addClient(wsConn)
 
-	// give client a username
+	// 为客户端随机分配一个用户名
 	m := Message{pickUser(), ""}
 	wsConn.WriteJSON(m)
 
 	for {
 		var msg Message
-		err := wsConn.ReadJSON(&msg) // read from client
+		// 从客户端读取消息
+		err := wsConn.ReadJSON(&msg)
 		if err != nil {
 			log.Printf("error : %v", err)
 			clients.removeClient(wsConn)
@@ -79,7 +83,8 @@ func handleMsgs() {
 		msg := <- msgPool
 		clients.m.RLock()
 		for client := range clients.cs {
-			err := client.WriteJSON(msg) // write to client
+			// 向客户端发消息
+			err := client.WriteJSON(msg)
 			if err != nil {
 				log.Printf("error : %v", err)
 				client.Close()
