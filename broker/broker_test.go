@@ -6,12 +6,7 @@ import (
 	"sync"
 )
 
-func TestBroker(t *testing.T) {
-	testBasic(t)
-	testCocurrent(t)
-}
-
-func testBasic(t *testing.T) {
+func TestBasic(t *testing.T) {
 	broker := NewBroker()
 
 	var n int
@@ -69,7 +64,7 @@ func testBasic(t *testing.T) {
 	sub3.Unsubscribe()
 }
 
-func testCocurrent(t *testing.T) {
+func TestCocurrent(t *testing.T) {
 	broker := NewBroker()
 
 	var wg sync.WaitGroup
