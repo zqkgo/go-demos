@@ -103,3 +103,32 @@ func TestStructVal(t *testing.T) {
 		t.Fatal("fail to parse struct type value")
 	}
 }
+
+func TestMapVal(t *testing.T) {
+	m := map[string][]int{
+		"even": {2,4,6,8},
+		"odd": {1,3,5,7},
+	}
+	c := NewCache(1)
+	c.Set("mk", m, 3 * time.Second)
+	v,_ := c.Get("mk")
+	cv := v.(map[string][]int)
+	for k, v := range cv["even"] {
+		if v != m["even"][k] {
+			t.Fatal("cannot resolve map value")
+		}
+	}
+}
+
+func TestFuncVal(t *testing.T) {
+	double := func(n int) int {
+		return 2 * n
+	}
+	c := NewCache(1)
+	c.Set("fk", double, 3 * time.Second)
+	v,_ := c.Get("fk")
+	cv := v.(func(int) int)
+	if cv(2) != 4 {
+		t.Fatal("cannot resolve func value")
+	}
+}
