@@ -19,8 +19,10 @@ type IProxy interface {
 type Server struct {
 	Scheme string `json:"scheme"`
 	Host   string `json:"host"`
-	Port   int  `json:"port"`
+	Port   int    `json:"port"`
 	conns  int
+	up     bool
+	mu     sync.RWMutex
 }
 
 type Proxy struct {
@@ -67,10 +69,20 @@ func (p *Proxy) Forward(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	// 开始转发
+	s.mu.Lock()
 	s.conns++
+	s.mu.Unlock()
+
 	resp, err := client.Do(r)
+
+	s.mu.Lock()
 	s.conns--
+	s.mu.Unlock()
+
 	if err != nil {
+		s.mu.Lock()
+		s.up = false
+		s.mu.Unlock()
 		return p.Forward(w, r)
 	}
 	defer resp.Body.Close()
@@ -99,10 +111,15 @@ func (p *Proxy) PickServer() (*Server, error) {
 	var s *Server
 	minConn := math.MaxInt64
 	for _, server := range p.servers {
-		if server.conns < minConn {
+		server.mu.RLock()
+		if server.conns < minConn && server.up {
 			minConn = server.conns
 			s = server
 		}
+		server.mu.RUnlock()
+	}
+	if s == nil {
+		return nil, errors.New("no running servers")
 	}
 	return s, nil
 }
@@ -118,6 +135,7 @@ func (p *Proxy) AddServer(key string, server *Server) error {
 	if ok {
 		return errors.New("key has been used")
 	}
+	server.up = true
 	p.servers[key] = server
 	return nil
 }
@@ -136,8 +154,8 @@ func (p *Proxy) RemoveServer(key string) error {
 func NewProxy(scheme, host string, port int) *Proxy {
 	return &Proxy{
 		servers: make(map[string]*Server),
-		scheme: scheme,
-		host: host,
-		port: port,
+		scheme:  scheme,
+		host:    host,
+		port:    port,
 	}
 }

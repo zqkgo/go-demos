@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"time"
+	"sync"
 )
 
 var data = `
@@ -63,6 +64,13 @@ func TestProxy(t *testing.T) {
 	}
 
 	// 启动server
+	type stats struct {
+		mu sync.RWMutex
+		stat map[int]int
+	}
+	sts := stats{
+		stat: make(map[int]int),
+	}
 	for k, s := range servers {
 		go func(k int ,s Server) {
 			mux := http.NewServeMux()
@@ -72,6 +80,9 @@ func TestProxy(t *testing.T) {
 			}
 			mux.HandleFunc("/foo", func(w http.ResponseWriter, r *http.Request) {
 				<-time.After(500 * time.Millisecond) // 模拟使server持有连接一段时间
+				sts.mu.Lock()
+				sts.stat[s.Port]++
+				sts.mu.Unlock()
 				w.Write([]byte(fmt.Sprintf("server %d with port %d handling\n", k, s.Port)))
 			})
 			err := server.ListenAndServe()
@@ -103,4 +114,9 @@ func TestProxy(t *testing.T) {
 	}
 
 	<-time.After(10 * time.Second)
+
+	// 统计
+	for port, reqs := range sts.stat {
+		t.Logf("port %d handled %d requests\n", port, reqs)
+	}
 }
