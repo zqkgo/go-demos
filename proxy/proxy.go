@@ -71,7 +71,7 @@ func (p *Proxy) Forward(w http.ResponseWriter, r *http.Request) error {
 	resp, err := client.Do(r)
 	s.conns--
 	if err != nil {
-		return err
+		return p.Forward(w, r)
 	}
 	defer resp.Body.Close()
 
