@@ -1,0 +1,1 @@
+A collection of demos to introduce basic implementation of backend development in [Golang](https://golang.org/).
