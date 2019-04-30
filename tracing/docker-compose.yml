@@ -1,0 +1,99 @@
+# tell docker what version of the docker-compose.yml we're using
+version: '3'
+
+# define the network
+networks:
+  web-network:
+
+# start the services section
+services:
+  srv1:
+    build:
+      context: ./srv1
+    ports:
+    - "65512:65512"
+    tty: true
+    # 确保映射GOPATH/src
+    volumes:
+    - /usr/local/var/www/go:/go
+    working_dir: /go/src/github.com/kongoole/go-demos/tracing/srv1
+    command: go run main.go
+    networks:
+    - web-network
+  srv2:
+    build:
+      context: ./srv2
+    ports:
+    - "65513:65513"
+    tty: true
+    volumes:
+    - /usr/local/var/www/go:/go
+    working_dir: /go/src/github.com/kongoole/go-demos/tracing/srv2
+    command: go run main.go
+    networks:
+    - web-network
+  srv3:
+    build:
+      context: ./srv3
+    ports:
+    - "65514:65514"
+    tty: true
+    volumes:
+    - /usr/local/var/www/go:/go
+    working_dir: /go/src/github.com/kongoole/go-demos/tracing/srv3
+    command: go run main.go
+    networks:
+    - web-network
+  srv4:
+    build:
+      context: ./srv4
+    ports:
+    - "65515:65515"
+    tty: true
+    volumes:
+    - /usr/local/var/www/go:/go
+    working_dir: /go/src/github.com/kongoole/go-demos/tracing/srv4
+    command: go run main.go
+    networks:
+    - web-network
+  srv5:
+    build:
+      context: ./srv5
+    ports:
+    - "65516:65516"
+    tty: true
+    volumes:
+    - /usr/local/var/www/go:/go
+    working_dir: /go/src/github.com/kongoole/go-demos/tracing/srv5
+    command: go run main.go
+    networks:
+    - web-network
+  srv6:
+    build:
+      context: ./srv6
+    ports:
+    - "65517:65517"
+    tty: true
+    volumes:
+    - /usr/local/var/www/go:/go
+    working_dir: /go/src/github.com/kongoole/go-demos/tracing/srv6
+    command: go run main.go
+    networks:
+    - web-network
+  srv7:
+    build:
+      context: ./srv7
+    ports:
+    - "65518:65518"
+    tty: true
+    volumes:
+    - /usr/local/var/www/go:/go
+    working_dir: /go/src/github.com/kongoole/go-demos/tracing/srv7
+    command: go run main.go
+    networks:
+    - web-network
+  zipkin:
+    build:
+      context: ./zipkin
+    ports:
+    - 9411:9411
