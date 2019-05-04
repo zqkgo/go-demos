@@ -3,7 +3,7 @@ package dsa
 import "github.com/pkg/errors"
 
 var (
-	errStackFull = errors.New("stack is full")
+	errStackFull  = errors.New("stack is full")
 	errStackEmpty = errors.New("stack is empty")
 )
 
@@ -16,7 +16,7 @@ type SqStack struct {
 func NewSqStack(maxSize int) *SqStack {
 	return &SqStack{
 		data: make([]int, maxSize),
-		top: -1,
+		top:  -1,
 	}
 }
 
@@ -26,8 +26,8 @@ func (s *SqStack) IsEmpty() bool {
 }
 
 // 判满
-func (s * SqStack) IsFull() bool {
-	return s.top + 1 == len(s.data)
+func (s *SqStack) IsFull() bool {
+	return s.top+1 == len(s.data)
 }
 
 // 进栈
