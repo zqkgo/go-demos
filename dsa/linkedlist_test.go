@@ -52,3 +52,28 @@ func TestLinkedList(t *testing.T) {
 		t.Fatalf("want %s, got %s\n", "n too big", err)
 	}
 }
+
+func TestDLinkedList(t *testing.T) {
+	l := NewDLNode(0)
+	l.InsertAtTail(1, 2, 3, 4, 5)
+	n, _ := l.FindAt(1)
+	if n != 1 {
+		t.Fatalf("want %d, got %d\n", 1, n)
+	}
+
+	l.InsertAtHead(44, 55, 66)
+	n, _ = l.FindAt(2)
+	if n != 55 {
+		t.Fatalf("want %d, got %d\n", 55, n)
+	}
+	if l.Next.Next.Next.Next.Prior.Data != 44 {
+		t.Fatalf("want %d, got %d\n", 44, n)
+	}
+
+	l.DeleteAt(5)
+	n, _ = l.FindAt(5)
+	t.Log(l.Next.Next.Next.Next.Prior.Data)
+	if n != 3 {
+		t.Fatalf("want %d, got %d\n", 3, n)
+	}
+}
