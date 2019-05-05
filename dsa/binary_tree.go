@@ -49,6 +49,11 @@ func (n *BTNode) PreOrder() {
 	n.right.PreOrder()
 }
 
+// TODO: 非递归先序遍历
+func (n *BTNode) PreOrderNonrecursion() {
+
+}
+
 // 中序遍历
 func (n *BTNode) InOrder() {
 	if n == nil {
@@ -59,6 +64,11 @@ func (n *BTNode) InOrder() {
 	n.right.InOrder()
 }
 
+// TODO: 非递归中序遍历
+func (n *BTNode) InOrderNonrecursion() {
+
+}
+
 // 后序遍历
 func (n *BTNode) PostOrder() {
 	if n == nil {
@@ -67,6 +77,11 @@ func (n *BTNode) PostOrder() {
 	n.left.PostOrder()
 	n.right.PostOrder()
 	n.Visit()
+}
+
+// TODO: 非递归后序遍历
+func (n *BTNode) PostOrderNonrecursion() {
+
 }
 
 // 层序遍历
