@@ -4,3 +4,5 @@
 * double/linked list - 双/单链表
 * stack - 栈
 * queue - 队列
+* string - 串
+* binary tree - 二叉树
